@@ -1,0 +1,179 @@
+<!DOCTYPE html><html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dragon Bamboo Studio</title><style>
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: #0a0a0a;
+  color: #fff;
+  overflow-x: hidden;
+}
+
+header {
+  text-align: center;
+  padding: 25px;
+  font-size: 24px;
+  color: #FFD700;
+  letter-spacing: 2px;
+}
+
+.products {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  padding: 20px;
+}
+
+.card {
+  background: linear-gradient(145deg, #111, #0a0a0a);
+  border: 1px solid rgba(255,215,0,0.3);
+  border-radius: 18px;
+  padding: 15px;
+  transition: 0.3s;
+  position: relative;
+}
+
+.card:hover {
+  transform: translateY(-10px) scale(1.02);
+  box-shadow: 0 0 25px rgba(255,215,0,0.6);
+}
+
+.card img {
+  width: 100%;
+  border-radius: 12px;
+}
+
+button {
+  background: linear-gradient(45deg, #FFD700, #ffcc00);
+  border: none;
+  padding: 12px;
+  width: 100%;
+  cursor: pointer;
+  margin-top: 10px;
+  border-radius: 10px;
+  font-weight: bold;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+input {
+  width: 100%;
+  margin-top: 5px;
+  padding: 8px;
+  border-radius: 6px;
+  border: none;
+}
+
+.review {
+  margin-top: 8px;
+  font-size: 13px;
+  opacity: 0.9;
+}
+
+.cursor {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #FFD700;
+  border-radius: 50%;
+  position: fixed;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 15px #FFD700;
+}
+</style></head><body><div class="cursor"></div><header>DRAGON BAMBOO STUDIO</header><section class="products" id="products"></section><script>
+const products = [
+  {
+    id: 1,
+    name: "Roblox Combat System",
+    description: "Advanced combat system with animations, combo skill, and hit effects.",
+    price: "$25",
+    image: "https://tr.rbxcdn.com/5b8e6b5c9d5e9f7c5c8a5c9e6b5c9d5e/768/432/Image/Png"
+  }
+];
+
+const container = document.getElementById("products");
+
+products.forEach(p => {
+  const div = document.createElement("div");
+  div.className = "card";
+
+  div.innerHTML = `
+    <img src="${p.image}">
+    <h2>${p.name}</h2>
+    <p>${p.description}</p>
+    <strong>${p.price}</strong>
+    <button onclick="buy()">MUA NGAY</button>
+
+    <div id="reviews-${p.id}"></div>
+
+    <form onsubmit="submitReview(event, ${p.id})">
+      <input placeholder="Tên" required>
+      <input placeholder="Nội dung" required>
+      <input type="number" min="1" max="5" placeholder="Sao (1-5)" required>
+      <button type="submit">Gửi đánh giá</button>
+    </form>
+  `;
+
+  container.appendChild(div);
+  loadReviews(p.id);
+});
+
+function buy() {
+  alert("Đang chuyển tới Discord...");
+  window.open("https://discord.com/users/YOUR_USER_ID");
+}
+
+function submitReview(e, id) {
+  e.preventDefault();
+  const inputs = e.target.querySelectorAll("input");
+
+  const review = {
+    name: inputs[0].value,
+    text: inputs[1].value,
+    stars: inputs[2].value
+  };
+
+  const data = JSON.parse(localStorage.getItem("reviews-" + id)) || [];
+  data.push(review);
+  localStorage.setItem("reviews-" + id, JSON.stringify(data));
+
+  e.target.reset();
+  loadReviews(id);
+}
+
+function loadReviews(id) {
+  const container = document.getElementById("reviews-" + id);
+  const data = JSON.parse(localStorage.getItem("reviews-" + id)) || [];
+
+  container.innerHTML = "";
+
+  let total = 0;
+
+  data.forEach(r => {
+    total += Number(r.stars);
+    const div = document.createElement("div");
+    div.className = "review";
+    div.innerText = `${r.name}: ${r.text} (${r.stars}⭐)`;
+    container.appendChild(div);
+  });
+
+  if (data.length > 0) {
+    const avg = (total / data.length).toFixed(1);
+    const avgDiv = document.createElement("div");
+    avgDiv.innerHTML = `⭐ Trung bình: ${avg}`;
+    container.prepend(avgDiv);
+  }
+}
+
+// Cursor effect
+const cursor = document.querySelector('.cursor');
+document.addEventListener('mousemove', e => {
+  cursor.style.left = e.clientX + 'px';
+  cursor.style.top = e.clientY + 'px';
+});
+</script></body>
+  </html>
